@@ -184,3 +184,43 @@ Detalles de implementación:
 - Verificado: hidratación con 0 diferencias, orden en el DOM
   pregunta → respuesta → sugerencias → espaciador, y pruebas de la geometría del
   desplazamiento con respuestas largas y cortas.
+
+---
+
+## Actualización del RAG (base de conocimiento del chat)
+
+Cambios realizados en la base de conocimiento de **Black Smart AI**
+(`assets/routes-CgDv_qJj.js`, literal al inicio del archivo):
+
+1. **Se eliminó la entrada de la edad.** Ya no figura ningún dato de edad ni de
+   año de nacimiento.
+2. **Se eliminaron los movimientos políticos anteriores.** La entrada de la
+   regiduría 2019-2022 ya no menciona la organización con la que postuló, y la
+   entrada de la elección de 2022 conserva el resultado (19.43% de los votos
+   válidos, ONPE) sin nombrar el movimiento. Se mantiene **Ahora Nación** por
+   tratarse de la candidatura actual.
+3. **Se añadió la formación escolar:** primaria en la **Escuelita Primaria
+   Miguel Grau** y secundaria en el **Colegio Nacional de la Independencia
+   Americana**. Aparece en la respuesta de «formación académica» y además en una
+   entrada propia («¿En qué colegio estudió?», «¿Dónde hizo la primaria y la
+   secundaria?», «¿Estudió en el Colegio Independencia?», etc.).
+
+Además se agregó un **filtro previo** en la función `m()` del chat: si el
+visitante pregunta por la edad, el año o la fecha de nacimiento, el asistente
+responde con cortesía que ese dato no forma parte de su información y ofrece
+hablar de la trayectoria, la formación o la gestión. Sin este filtro, al no
+existir ya la entrada de la edad, el buscador podía devolver por error alguna
+respuesta de obras por año.
+
+La base sigue teniendo **81 preguntas** (se quitó una y se añadió otra).
+Tras editar el literal se regeneró `assets/app-local.js` con:
+
+```
+esbuild assets/index-D88hnOn-.js --bundle --minify --format=iife --outfile=assets/app-local.js
+```
+
+Verificado: recuperación correcta del chat para «¿en qué colegio estudió?»,
+«¿dónde hizo su primaria?», «¿estudió en el Colegio Independencia?»,
+«¿cuál es su formación académica?», «¿dónde nació?», «¿fue regidor antes?»,
+«¿con cuántos votos ganó la alcaldía?» y «¿por qué partido postula?»; y las
+preguntas de edad/nacimiento entran al filtro sin devolver dato personal.
